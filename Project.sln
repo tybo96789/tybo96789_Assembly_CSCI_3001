@@ -10,7 +10,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASMLibrary", "ASMLibrary", "{F8A55C81-FE0A-471C-A369-F631A3CEC564}"
 	ProjectSection(SolutionItems) = preProject
 		AddTwo.asm = AddTwo.asm
+		AtiburcioTyler_SetTextColor.asm = AtiburcioTyler_SetTextColor.asm
 		FirstProgram.asm = FirstProgram.asm
+		Template.asm = Template.asm
+		TylerAtiburcio_IntegerExpressionCalculation.asm = TylerAtiburcio_IntegerExpressionCalculation.asm
 	EndProjectSection
 EndProject
 Global
