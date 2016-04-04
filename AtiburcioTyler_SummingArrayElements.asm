@@ -4,7 +4,7 @@ TITLE Summing Array Elements
 ; /*Program Description : Creating a procedure that returns the sum of all array elements falling within the range [j,k] inclusive
   ; Author: Tyler Atiburcio
   ; Creation Date : 4/1/16
-  ; Revisions:
+  ; Revisions: 2
   ; Date:              Modified by :
   ;*/
 
@@ -24,7 +24,6 @@ PUSHAD							;Preserve all 32bit general purpose registers
 
 mov edi, OFFSET [nums]			;Store address of nums to esi
 mov eax, 0						;Set the sum total to 0
-mov ecx, LENGTHOF nums			;Store the length of the nums array to ecx
 mov ebx, 0						;Start summing range
 mov ecx, 4						;End of summing range
 
@@ -36,7 +35,7 @@ INVOKE ExitProcess, 0
 main ENDP
 ; (insert additional procedures here)
 
-summArray PROC
+summArray PROC USES EDI EAX EBX ECX
 ; /*-------------------------------------------------------- -
 ; summArray PROC
 ;
@@ -47,7 +46,7 @@ summArray PROC
 ; Overflow, etc.) are changed.
 ; Requires: nothing
 ; -------------------------------------------------------- -*/
-sub ecx, ebx			;Manage offset
+sub ecx, ebx			;Manage offset to get length of the range
 .IF ebx > 0				;If start point is greater than 0 keep looping till you reach that point	
 L1:
 add edi, TYPE nums		; Point to next element

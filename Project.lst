@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/03/16 14:50:51
+Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/03/16 20:10:23
 Summing Array Element					     Page 1 - 1
 
 
@@ -48,21 +48,20 @@ Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/03/16 14:50:51
 
  00000001  BF 00000000 R	mov edi, OFFSET [nums]			;Store address of nums to esi
  00000006  B8 00000000		mov eax, 0						;Set the sum total to 0
- 0000000B  B9 00000004		mov ecx, LENGTHOF nums			;Store the length of the nums array to ecx
- 00000010  BB 00000000		mov ebx, 0						;Start summing range
- 00000015  B9 00000004		mov ecx, 4						;End of summing range
+ 0000000B  BB 00000000		mov ebx, 0						;Start summing range
+ 00000010  B9 00000004		mov ecx, 4						;End of summing range
 
- 0000001A  E8 00000008		call summArray
+ 00000015  E8 00000008		call summArray
 
- 0000001F  61			POPAD							;Restore All 32bit general purpose registers
+ 0000001A  61			POPAD							;Restore All 32bit general purpose registers
 
 				INVOKE ExitProcess, 0
- 00000020  6A 00	   *	    push   +000000000h
- 00000022  E8 00000000 E   *	    call   ExitProcess
- 00000027			main ENDP
+ 0000001B  6A 00	   *	    push   +000000000h
+ 0000001D  E8 00000000 E   *	    call   ExitProcess
+ 00000022			main ENDP
 				; (insert additional procedures here)
 
- 00000027			summArray PROC
+ 00000022			summArray PROC USES EDI EAX EBX ECX
 				; /*-------------------------------------------------------- -
 				; summArray PROC
 				;
@@ -73,26 +72,35 @@ Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/03/16 14:50:51
 				; Overflow, etc.) are changed.
 				; Requires: nothing
 				; -------------------------------------------------------- -*/
- 00000027  2B CB		sub ecx, ebx			;Manage offset
+ 00000022  57		   *	    push   edi
+ 00000023  50		   *	    push   eax
+ 00000024  53		   *	    push   ebx
+ 00000025  51		   *	    push   ecx
+ 00000026  2B CB		sub ecx, ebx			;Manage offset to get length of the range
 				.IF ebx > 0				;If start point is greater than 0 keep looping till you reach that point	
- 00000029  83 FB 00	   *	    cmp    ebx, 000h
- 0000002C  76 06	   *	    jbe    @C0001
- 0000002E			L1:
- 0000002E  83 C7 04		add edi, TYPE nums		; Point to next element
- 00000031  4B			dec ebx
- 00000032  75 FA		jnz L1
+ 00000028  83 FB 00	   *	    cmp    ebx, 000h
+ 0000002B  76 06	   *	    jbe    @C0001
+ 0000002D			L1:
+ 0000002D  83 C7 04		add edi, TYPE nums		; Point to next element
+ 00000030  4B			dec ebx
+ 00000031  75 FA		jnz L1
 				.ENDIF
- 00000034		   *@C0001:
- 00000034			L2:
- 00000034  03 07		add eax, [edi]			;Add element to sum
- 00000036  83 C7 04		add edi, TYPE nums		;Point to next element
- 00000039  49			dec ecx
- 0000003A  75 F8		jnz L2					;Loop through the end of the range
- 0000003C  A3 00000010 R	mov sum, eax			;store sum
- 00000041  C3			ret
- 00000042			summArray ENDP
+ 00000033		   *@C0001:
+ 00000033			L2:
+ 00000033  03 07		add eax, [edi]			;Add element to sum
+ 00000035  83 C7 04		add edi, TYPE nums		;Point to next element
+ 00000038  49			dec ecx
+ 00000039  75 F8		jnz L2					;Loop through the end of the range
+ 0000003B  A3 00000010 R	mov sum, eax			;store sum
+				ret
+ 00000040  59		   *	    pop    ecx
+ 00000041  5B		   *	    pop    ebx
+ 00000042  58		   *	    pop    eax
+ 00000043  5F		   *	    pop    edi
+ 00000044  C3		   *	    ret    00000h
+ 00000045			summArray ENDP
 				END main
-Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/03/16 14:50:51
+Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/03/16 20:10:23
 Summing Array Element					     Symbols 2 - 1
 
 
@@ -187,7 +195,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 00000014 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000042 Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000045 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -294,12 +302,12 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000027 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000022 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-summArray  . . . . . . . . . . .	P Near	 00000027 _TEXT	Length= 0000001B Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 0000002E _TEXT	
-  L2 . . . . . . . . . . . . . .	L Near	 00000034 _TEXT	
+summArray  . . . . . . . . . . .	P Near	 00000022 _TEXT	Length= 00000023 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 0000002D _TEXT	
+  L2 . . . . . . . . . . . . . .	L Near	 00000033 _TEXT	
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 
 
