@@ -11,10 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASMLibrary", "ASMLibrary", 
 	ProjectSection(SolutionItems) = preProject
 		AddTwo.asm = AddTwo.asm
 		AtiburcioTyler_FindingPrimes.asm = AtiburcioTyler_FindingPrimes.asm
+		AtiburcioTyler_ReadString.asm = AtiburcioTyler_ReadString.asm
 		AtiburcioTyler_SetTextColor.asm = AtiburcioTyler_SetTextColor.asm
+		AtiburcioTyler_Str_Concat_Procedure.asm = AtiburcioTyler_Str_Concat_Procedure.asm
 		AtiburcioTyler_SummingArrayElements.asm = AtiburcioTyler_SummingArrayElements.asm
 		FirstProgram.asm = FirstProgram.asm
 		Template.asm = Template.asm
+		TestCase1.asm = TestCase1.asm
 		TylerAtiburcio_IntegerExpressionCalculation.asm = TylerAtiburcio_IntegerExpressionCalculation.asm
 	EndProjectSection
 EndProject

@@ -1,8 +1,8 @@
-Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/17/16 22:12:40
-AtiburcioTyler_Str_Concat_Procedure.asm			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/24/16 21:21:20
+AtiburcioTyler_ReadString.asm				     Page 1 - 1
 
 
-				; Str_Concat_Procedure(AtiburcioTyler_Str_Concat_Procedure.asm)
+				; ReadString(AtiburcioTyler_ReadString.asm)
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
 			      C 
@@ -21,124 +21,106 @@ AtiburcioTyler_Str_Concat_Procedure.asm			     Page 1 - 1
 			      C .NOLIST
 			      C .LIST
 			      C 
-				; /*Program Description : A procedure that concatenates a source string to the end of a target string
-					;Sufficiemt space must exist in the target string to accommodate the new characters.
-				  ; Author: Tyler Atiburcio
-				  ; Creation Date : 4/11/16
-				  ; Revisions: 1
-				  ; Date:              Modified by :
-				  ;*/
+				; /*Program Description : Implementing your own version of ReadString Procedure, using statck parameters.
+				;	ReadString(str:PTR, int maxCharacters to enter)
+				; Return the count of characters actually entered, in EAX
+				; Author: Tyler Atiburcio
+				; Creation Date : 4/20/16
+				; Revisions: 3
+				; Date:              Modified by :
+				;*/
+
+				;Method Declearation
+				Read_String PROTO str1:PTR DWORD, inputCount:DWORD
 
 				.386
 				;.model flat, stdcall
 				.stack 4096
 				ExitProcess PROTO, dwExitCode : DWORD
-
-
-				;Method declaration
-				Str_concat PROTO, dest:PTR BYTE, src:PTR BYTE
-
  00000000			.data
 				; declare variables here
- 00000000 41 42 43 45		targetStr BYTE "ABCE", 10 DUP(0)
-	   0000000A [
-	    00
+
+ 00000000  0000000A [		string DWORD 10 DUP(0)
+	    00000000
 	   ]
- 0000000E 46 47 48 00		sourceStr BYTE "FGH", 0
+ 00000028 0000000A		count DWORD 10 
+ 0000002C 50 6C 65 61 73	msg BYTE "Please enter a string: ",0
+	   65 20 65 6E 74
+	   65 72 20 61 20
+	   73 74 72 69 6E
+	   67 3A 20 00
+ 00000044 20 3A 54 6F 74	endMsg BYTE " :Total Characters entered",0
+	   61 6C 20 43 68
+	   61 72 61 63 74
+	   65 72 73 20 65
+	   6E 74 65 72 65
+	   64 00
+
+
  00000000			.code
  00000000			main PROC
-				; write your code here
+				; write your code hereB
 
 
-				;Print the source and destination arrays before concatenate
- 00000000  B8 0000000E R	mov EAX, OFFSET sourceStr			
+ 00000000  BA 0000002C R	mov EDX, OFFSET msg				;Write Prompt to standard output
  00000005  E8 00000000 E	call WriteString
  0000000A  E8 00000000 E	call Crlf
- 0000000F  BB 00000000 R	mov EBX, OFFSET targetStr
- 00000014  E8 00000000 E	call WriteString
- 00000019  E8 00000000 E	call Crlf
 
-				;INVOKE Str_concat, ADDR sourceStr, ADDR targetStr				;Test case if source is larger than destination array
-				INVOKE Str_concat, ADDR targetStr, ADDR sourceStr
- 0000001E  68 0000000E R   *	    push   OFFSET sourceStr
- 00000023  68 00000000 R   *	    push   OFFSET targetStr
- 00000028  E8 00000016	   *	    call   Str_concat
 
-				;Print the destination array after calling str_concat
- 0000002D  BB 00000000 R	mov EBX, OFFSET targetStr
- 00000032  E8 00000000 E	call WriteString
- 00000037  E8 00000000 E	call Crlf
+				INVOKE Read_String, ADDR string, count
+ 0000000F  FF 35 00000028 R *	    push   count
+ 00000015  68 00000000 R   *	    push   OFFSET string
+ 0000001A  E8 0000002A	   *	    call   Read_String
 
+ 0000001F  E8 00000000 E	call Crlf
+ 00000024  BA 0000002C R	mov EDX, OFFSET msg				;Write Ending prompt to standard output
+ 00000029  E8 00000000 E	call WriteString
+ 0000002E  E8 00000000 E	call Crlf
+ 00000033  E8 00000000 E	call WriteInt					;Write the amount of characters actually entered
+ 00000038  E8 00000000 E	call Crlf
+
+ 0000003D  E8 00000000 E	call DumpRegs					;For Debug
 				INVOKE ExitProcess, 0
- 0000003C  6A 00	   *	    push   +000000000h
- 0000003E  E8 00000000 E   *	    call   ExitProcess
- 00000043			main ENDP
+ 00000042  6A 00	   *	    push   +000000000h
+ 00000044  E8 00000000 E   *	    call   ExitProcess
+ 00000049			main ENDP  
 				; (insert additional procedures here)
 
-
-
- 00000043			Str_concat PROC USES EAX EBX ECX ESI EDI, dest:PTR BYTE, src:PTR BYTE
+ 00000049			Read_String PROC USES ECX EBX EDI, str1:PTR DWORD, inputCount:DWORD
 				; /*-------------------------------------------------------- -
-				; Str_concat PROC
+				; Read_String PROC
 				;
-				; Concatenates strings together, but checks if the destination array can hold the
-				;	data in the source array. Concatenates source array to the end of the destination array
-				; Receives: dest:PTR BYTE; The destination array, src:PTR BYTE the source array 
-				; Returns: None
+				; Reads in a string from standard input and stores that string into an array, 
+				; 	and keep tracks of how many characters has been actually inputted
+				; Receives: str1:PTR DWORD; The array to hold the string, inputCount: DWORD; requested amount of characters
+				; Returns: EAX-Amount of characters actually entered, EDX-The entered String
 				; Requires: nothing
 				; -------------------------------------------------------- -*/
- 00000043  55		   *	    push   ebp
- 00000044  8B EC	   *	    mov    ebp, esp
- 00000046  50		   *	    push   eax
- 00000047  53		   *	    push   ebx
- 00000048  51		   *	    push   ecx
- 00000049  56		   *	    push   esi
- 0000004A  57		   *	    push   edi
- 0000004B  B8 00000001		mov EAX, LENGTHOF src			;Get the Length of source array
- 00000050  BB 00000001		mov EBX, LENGTHOF dest			;Get the length of the destination array
- 00000055  8B 75 0C		mov ESI, src					;Move source poniter to ESI
- 00000058  8B 7D 08		mov EDI, dest					;Move Destination pointer to EDI
+ 00000049  55		   *	    push   ebp
+ 0000004A  8B EC	   *	    mov    ebp, esp
+ 0000004C  51		   *	    push   ecx
+ 0000004D  53		   *	    push   ebx
+ 0000004E  57		   *	    push   edi
+ 0000004F  B8 00000000			mov EAX, 0					;Set character count to 0
+ 00000054  8B 4D 0C			mov ECX, inputCount			;Move requested amount of characters to be entered into ECX
+ 00000057  8B 7D 08			mov EDI, str1				;Move str1 Point to ESI 		
+ 0000005A  E8 00000000 E		call ReadString				;Call  ReadString to read from standard input
+ 0000005F  89 17			mov [EDI],EDX				;Move input into ESI
+ 00000061  83 C7 04			add EDI, TYPE str1			;Increment to the next section of the ESI
+ 00000064  BB 00000000			mov EBX, 0					 
+ 00000069  89 1F			mov [EDI], EBX				;Insert end of line
+ 0000006B  3B C1			cmp EAX, ECX				;Compare the actual amount of characters entered to requested characters
+					ret
+ 0000006D  5F		   *	    pop    edi
+ 0000006E  5B		   *	    pop    ebx
+ 0000006F  59		   *	    pop    ecx
+ 00000070  C9		   *	    leave  
+ 00000071  C2 0008	   *	    ret    00008h
 
-				.REPEAT							
- 0000005B		   *@C0001:
- 0000005B  83 C7 04		add EDI, TYPE dest
- 0000005E  48			dec EAX
-				.UNTIL EAX == 0					;Loop to the ending part of part of the destination array
- 0000005F  0B C0	   *	    or	eax, eax
- 00000061  75 F8	   *	    jne    @C0001
-
-				.IF EDI > ESI					;If destination is smaller than source, there is not enough room in destination array return immediately
- 00000063  3B FE	   *	    cmp    edi, esi
- 00000065  76 02	   *	    jbe    @C0003
- 00000067  EB 0F		jmp endLabel
-				.ENDIF
- 00000069		   *@C0003:
-
-				.REPEAT
- 00000069		   *@C0005:
- 00000069  8B 0E		mov ECX,[ESI]					;Move the current values in source array and store into ECX
- 0000006B  89 0F		mov [EDI],ECX					;Store the value of ECX into the destination array
- 0000006D  83 C7 04		add EDI, TYPE dest				;Increment to the next element in the destination array
- 00000070  83 C6 04		add ESI, TYPE src				;Increment to the next element in the source array
- 00000073  4B			dec EBX
-				.UNTIL EBX == 0
- 00000074  0B DB	   *	    or	ebx, ebx
- 00000076  75 F1	   *	    jne    @C0005
-
- 00000078			endLabel:
-				ret
- 00000078  5F		   *	    pop    edi
- 00000079  5E		   *	    pop    esi
- 0000007A  59		   *	    pop    ecx
- 0000007B  5B		   *	    pop    ebx
- 0000007C  58		   *	    pop    eax
- 0000007D  C9		   *	    leave  
- 0000007E  C2 0008	   *	    ret    00008h
- 00000081			Str_concat ENDP 
-
+ 00000074			Read_String ENDP
 				END main
-Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/17/16 22:12:40
-AtiburcioTyler_Str_Concat_Procedure.asm			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.00.23506.0	    04/24/16 21:21:20
+AtiburcioTyler_ReadString.asm				     Symbols 2 - 1
 
 
 
@@ -231,8 +213,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000012 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000081 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000005F Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000074 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -302,6 +284,9 @@ ReadInt  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ReadKeyFlush . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadKey  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadString . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+Read_String  . . . . . . . . . .	P Near	 00000049 _TEXT	Length= 0000002B Public STDCALL
+  str1 . . . . . . . . . . . . .	DWord	 bp + 00000008
+  inputCount . . . . . . . . . .	DWord	 bp + 0000000C
 SetConsoleCursorInfo . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleCursorPosition . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleMode . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -316,10 +301,6 @@ ShowFPUStack . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 Sleep  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 StrLength  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Str_compare  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-Str_concat . . . . . . . . . . .	P Near	 00000043 _TEXT	Length= 0000003E Public STDCALL
-  dest . . . . . . . . . . . . .	DWord	 bp + 00000008
-  src  . . . . . . . . . . . . .	DWord	 bp + 0000000C
-  endLabel . . . . . . . . . . .	L Near	 00000078 _TEXT	
 Str_copy . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Str_length . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Str_trim . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -343,7 +324,7 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000043 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000049 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -565,7 +546,9 @@ WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
+count  . . . . . . . . . . . . .	DWord	 00000028 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+endMsg . . . . . . . . . . . . .	Byte	 00000044 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
@@ -576,9 +559,9 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
+msg  . . . . . . . . . . . . . .	Byte	 0000002C _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-sourceStr  . . . . . . . . . . .	Byte	 0000000E _DATA	
-targetStr  . . . . . . . . . . .	Byte	 00000000 _DATA	
+string . . . . . . . . . . . . .	DWord	 00000000 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
