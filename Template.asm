@@ -10,6 +10,7 @@ INCLUDE Irvine32.inc
 .386
 .model flat, stdcall
 .stack 4096
+;Method Declaration
 ExitProcess PROTO, dwExitCode : DWORD
 .data
 ; declare variables here

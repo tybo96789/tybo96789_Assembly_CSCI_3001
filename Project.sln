@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASMLibrary", "ASMLibrary", 
 	ProjectSection(SolutionItems) = preProject
 		AddTwo.asm = AddTwo.asm
 		AtiburcioTyler_FindingPrimes.asm = AtiburcioTyler_FindingPrimes.asm
+		AtiburcioTyler_Floating-Point_Comparison.asm = AtiburcioTyler_Floating-Point_Comparison.asm
 		AtiburcioTyler_ReadString.asm = AtiburcioTyler_ReadString.asm
 		AtiburcioTyler_SetTextColor.asm = AtiburcioTyler_SetTextColor.asm
 		AtiburcioTyler_Str_Concat_Procedure.asm = AtiburcioTyler_Str_Concat_Procedure.asm
